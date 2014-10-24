@@ -10,6 +10,7 @@ call.py - Telemarketing script that displays the next name
 """
 
 import seed
+from sqlalchemy import and_
 
 
 # Retrieve the next uncontacted customer record from the database.
@@ -17,12 +18,14 @@ import seed
 #
 # Remember: Our telemarketers should only be calling customers
 #           who have placed orders of 20 melons or more.
-def get_next_customer():
-	eligible = session.query(seed.Order).filter(Order.num_watermelons >= 20).all()
+def get_next_customer(session):
+	eligible_orders = session.query(seed.Order).filter(seed.Order.num_watermelons >= "20").group_by(seed.Order.email).all()
 	
-	SELECT email FROM orders WHERE SUM(num_watermelons) > 20 GROUP BY email
+	emails = []
+	for order in eligible_orders:
+		emails.append(order.email)
 
-	#customer = session.query(seed.Customer).filter_by().one()
+	customer = session.query(seed.Customer).filter(and_(seed.Customer.email.in_(emails), seed.Customer.called == None)).first()
 
 	return customer
 
@@ -31,9 +34,12 @@ def display_next_to_call(customer):
 	print "---------------------"
 	print "Next Customer to call"
 	print "---------------------\n"
-	print customer
+	print customer.first, customer.last
+	print customer.telephone
 	print "\n"
 
+
+# def update_database(customer):
 
 # Update the "last called" column for the customer
 #   in the database.
@@ -41,23 +47,13 @@ def update_customer_called(customer):
 	pass
 
 def main():
-	session = seed.Session()
+	session = seed.connect()
+	customer = get_next_customer(session)
+	display_next_to_call(customer)
 
-	# connect_to_db()
-
-	# done = False
-
-	# while not done:
-	# 	customer = get_next_customer()
-	# 	display_next_to_call(customer)
-
-	# 	print "Mark this customer as called?"
-	# 	user_answer = raw_input('(y/n) > ')
-
-	# 	if user_answer.lower() == 'y':
-	# 		update_customer_called(customer)
-	# 	else:
-	# 		done = True
+	# update = raw_input("Update database? Y or N: ")
+	# if update == "Y":
+	# 	update_database(customer)
 
 
 if __name__ == '__main__':
