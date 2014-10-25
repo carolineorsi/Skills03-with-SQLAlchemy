@@ -10,8 +10,8 @@ call.py - Telemarketing script that displays the next name
 """
 
 import seed
-from sqlalchemy import and_
-from datetime import datetime
+from sqlalchemy import and_, or_
+from datetime import datetime, timedelta
 
 
 # Retrieve the next uncontacted customer record from the database.
@@ -27,6 +27,18 @@ def get_next_customer(session):
 		emails.append(order.email)
 
 	customer = session.query(seed.Customer).filter(and_(seed.Customer.email.in_(emails), seed.Customer.called == None)).first()
+
+##### Can't get this shit to work ########
+	# now = datetime.date(datetime.now())
+	# # customer = session.query(seed.Customer).filter(and_(seed.Customer.email.in_(emails), (or_(seed.Customer.called == None, (today - seed.Customer.called) > 30)))).first()
+	# # customer = session.query(seed.Customer).filter(and_(seed.Customer.email.in_(emails), ((now - seed.Customer.called) > timedelta(days=30)))).first()
+	# customer = session.query(seed.Customer).filter((now - seed.Customer.called) > timedelta(days=30)).all()
+	# # customer = session.query(seed.Customer).get(8)
+	# # print (datetime.date(datetime.now()) - customer.called) > timedelta(days=30)
+	# # print customer.called
+	# # print datetime.date(datetime.now())
+	# print customer
+
 	return customer
 
 
@@ -36,6 +48,7 @@ def display_next_to_call(customer):
 	print "---------------------\n"
 	print customer.first, customer.last
 	print customer.telephone
+	print "Last called: ", customer.called
 	print "\n"
 
 # Update the "last called" column for the customer
