@@ -26,18 +26,8 @@ def get_next_customer(session):
 	for order in eligible_orders:
 		emails.append(order.email)
 
-	customer = session.query(seed.Customer).filter(and_(seed.Customer.email.in_(emails), seed.Customer.called == None)).first()
-
-##### Can't get this shit to work ########
-	# now = datetime.date(datetime.now())
-	# # customer = session.query(seed.Customer).filter(and_(seed.Customer.email.in_(emails), (or_(seed.Customer.called == None, (today - seed.Customer.called) > 30)))).first()
-	# # customer = session.query(seed.Customer).filter(and_(seed.Customer.email.in_(emails), ((now - seed.Customer.called) > timedelta(days=30)))).first()
-	# customer = session.query(seed.Customer).filter((now - seed.Customer.called) > timedelta(days=30)).all()
-	# # customer = session.query(seed.Customer).get(8)
-	# # print (datetime.date(datetime.now()) - customer.called) > timedelta(days=30)
-	# # print customer.called
-	# # print datetime.date(datetime.now())
-	# print customer
+	now = datetime.date(datetime.now() - timedelta(days=30))
+	customer = session.query(seed.Customer).filter(and_(seed.Customer.email.in_(emails), (or_(seed.Customer.called == None, seed.Customer.called < now)))).first()
 
 	return customer
 

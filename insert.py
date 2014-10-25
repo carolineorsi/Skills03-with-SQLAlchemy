@@ -48,7 +48,8 @@ def load_customers(session):
 		try:
 			customer.called = datetime.strptime(row[5], "%m/%d/%Y")
 		except:
-			customer.called = None
+		 	#customer.called = datetime.strptime("01/01/1970", "%m/%d/%Y")
+		 	customer.called = None
 
 		customers_list.append(customer)
 		session.add(customers_list[i])
@@ -56,9 +57,9 @@ def load_customers(session):
 
 def main():
 	session = seed.connect()
-	load_orders(session)
+	#load_orders(session)
 	load_customers(session)
-	#session.commit()
+	session.commit()
 
 if __name__ == "__main__":
 	main()

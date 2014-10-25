@@ -2,7 +2,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy import Column, Integer, String, Date, Numeric
 from sqlalchemy.orm import sessionmaker
-import csv
 from datetime import datetime
 
 ENGINE = None
