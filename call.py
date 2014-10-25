@@ -11,6 +11,7 @@ call.py - Telemarketing script that displays the next name
 
 import seed
 from sqlalchemy import and_
+from datetime import datetime
 
 
 # Retrieve the next uncontacted customer record from the database.
@@ -26,7 +27,6 @@ def get_next_customer(session):
 		emails.append(order.email)
 
 	customer = session.query(seed.Customer).filter(and_(seed.Customer.email.in_(emails), seed.Customer.called == None)).first()
-
 	return customer
 
 
@@ -38,22 +38,21 @@ def display_next_to_call(customer):
 	print customer.telephone
 	print "\n"
 
-
-# def update_database(customer):
-
 # Update the "last called" column for the customer
 #   in the database.
-def update_customer_called(customer):
-	pass
+def update_customer_called(customer, session):
+	customer.called = datetime.now()
+	session.add(customer)
+	session.commit()
 
 def main():
 	session = seed.connect()
 	customer = get_next_customer(session)
 	display_next_to_call(customer)
 
-	# update = raw_input("Update database? Y or N: ")
-	# if update == "Y":
-	# 	update_database(customer)
+	update = raw_input("Update database? Y or N: ")
+	if update == "Y":
+		update_customer_called(customer, session)
 
 
 if __name__ == '__main__':
